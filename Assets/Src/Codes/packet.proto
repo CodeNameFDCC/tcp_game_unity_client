@@ -1,0 +1,20 @@
+/**
+ * 공통 패킷 메시지와 초기 패킷 메시지를 정의합니다.
+ * CommonPacket은 핸들러 ID, 플레이어 ID, 버전, 페이로드를 포함합니다.
+ * InitialPacket은 디바이스 ID를 포함합니다.
+ */
+
+syntax = "proto3"; // Protobuf 버전 3 사용
+
+// 공통 패킷 메시지 정의
+message CommonPacket {
+  uint32 handlerId = 1; // 핸들러 ID
+  uint32 playerId = 2; // 플레이어 ID
+  string version = 3; // 버전 정보
+  bytes payload = 4; // 페이로드 데이터
+}
+
+// 초기 패킷 메시지 정의
+message InitialPacket {
+  string deviceId = 1; // 디바이스 ID
+}
