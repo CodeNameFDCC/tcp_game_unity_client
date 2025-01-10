@@ -1,3 +1,6 @@
+//src/Codes/packet.proto
+
+
 /**
  * 공통 패킷 메시지와 초기 패킷 메시지를 정의합니다.
  * CommonPacket은 핸들러 ID, 플레이어 ID, 버전, 페이로드를 포함합니다.

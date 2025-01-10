@@ -1,3 +1,6 @@
+//src/Codes/Packets.cs
+
+
 /**
  * 패킷을 직렬화하고 역직렬화하는 기능을 제공하는 클래스입니다.
  * 다양한 패킷 유형과 페이로드에 대한 정의를 포함하고 있습니다.
@@ -47,60 +50,92 @@ public class Packets : MonoBehaviour
 public class InitialPayload
 {
     [ProtoMember(1, IsRequired = true)]
-    public string deviceId { get; set; } // 디바이스 ID
+    public string deviceId { get; set; }
 
     [ProtoMember(2, IsRequired = true)]
-    public uint playerId { get; set; } // 플레이어 ID
+    public uint playerId { get; set; }
 
     [ProtoMember(3, IsRequired = true)]
-    public float latency { get; set; } // 지연 시간
+    public float latency { get; set; }
 }
 
 [ProtoContract]
 public class CommonPacket
 {
     [ProtoMember(1)]
-    public uint handlerId { get; set; } // 핸들러 ID
+    public uint handlerId { get; set; }
 
     [ProtoMember(2)]
-    public string userId { get; set; } // 사용자 ID
+    public string userId { get; set; }
 
     [ProtoMember(3)]
-    public string version { get; set; } // 버전 정보
+    public string version { get; set; }
 
     [ProtoMember(4)]
-    public byte[] payload { get; set; } // 페이로드 데이터
+    public uint sequence { get; set; }  // sequence 필드 추가
+
+    [ProtoMember(5)]
+    public byte[] payload { get; set; }
 }
+
 
 [ProtoContract]
 public class LocationUpdatePayload
 {
-    [ProtoMember(1, IsRequired = true)]
-    public float x { get; set; } // x 좌표
-    [ProtoMember(2, IsRequired = true)]
-    public float y { get; set; } // y 좌표
+    [ProtoMember(1)]
+    public List<UserLocation> users { get; set; }
+
+    // JSON 직렬화를 위한 기본 생성자
+    public LocationUpdatePayload()
+    {
+        users = new List<UserLocation>();
+    }
+
+    [ProtoContract]
+    public class UserLocation
+    {
+        [ProtoMember(1)]
+        public string id { get; set; }
+
+        [ProtoMember(2)]
+        public float x { get; set; }
+
+        [ProtoMember(3)]
+        public float y { get; set; }
+
+        [ProtoMember(4)]
+        public string status { get; set; }
+    }
 }
 
 [ProtoContract]
 public class LocationUpdate
 {
     [ProtoMember(1)]
-    public List<UserLocation> users { get; set; } // 사용자 위치 목록
+    public List<UserLocation> users { get; set; }
+
+    public LocationUpdate()
+    {
+        users = new List<UserLocation>();
+    }
 
     [ProtoContract]
     public class UserLocation
     {
         [ProtoMember(1)]
-        public string id { get; set; } // 사용자 ID
+        public string id { get; set; }
 
         [ProtoMember(2)]
-        public uint playerId { get; set; } // 플레이어 ID
+        public float x { get; set; }
 
         [ProtoMember(3)]
-        public float x { get; set; } // x 좌표
+        public float y { get; set; }
 
         [ProtoMember(4)]
-        public float y { get; set; } // y 좌표
+        public string status { get; set; }
+
+        [ProtoMember(5)]
+        public uint playerId { get; set; }  // playerId 추가
     }
 }
 

@@ -1,3 +1,7 @@
+//src/Codes/Player.cs
+
+
+
 /**
  * 플레이어의 이동 및 애니메이션을 관리하는 클래스입니다.
  * 입력을 받아 플레이어의 위치를 업데이트하고, 애니메이션을 제어합니다.
@@ -45,31 +49,74 @@ public class Player : MonoBehaviour
     }
 
     // Update는 매 프레임 호출됩니다.
+
+
+    // void Update()
+    // {
+    //     if (!GameManager.instance.isLive)
+    //     {
+    //         return; // 게임이 진행 중이지 않으면 종료
+    //     }
+    //     // 입력 벡터 업데이트
+    //     inputVec.x = Input.GetAxisRaw("Horizontal");
+    //     inputVec.y = Input.GetAxisRaw("Vertical");
+    //     inputVec.Normalize();
+
+
+    //     // 현재 위치 가져오기
+    //     Vector2 currentPosition = rigid.position;
+
+    //     // 위치가 변경되었을 때만 패킷 전송
+    //     if (inputVec != Vector2.zero)
+    //     {
+    //         // 위치 이동 패킷 전송 -> 서버로
+    //         NetworkManager.instance.SendLocationUpdatePacket(currentPosition.x, currentPosition.y);
+    //     }
+
+    //     // 위치 이동 패킷 전송 -> 서버로
+    //     // NetworkManager.instance.SendLocationUpdatePacket(rigid.position.x, rigid.position.y);
+    // }
+
+    // Update에서는 입력만 처리
     void Update()
     {
         if (!GameManager.instance.isLive)
-        {
-            return; // 게임이 진행 중이지 않으면 종료
-        }
-        // 입력 벡터 업데이트
+            return;
+
         inputVec.x = Input.GetAxisRaw("Horizontal");
         inputVec.y = Input.GetAxisRaw("Vertical");
-
-        // 위치 이동 패킷 전송 -> 서버로
-        NetworkManager.instance.SendLocationUpdatePacket(rigid.position.x, rigid.position.y);
+        inputVec.Normalize();
     }
+
+    // void FixedUpdate()
+    // {
+    //     if (!GameManager.instance.isLive)
+    //     {
+    //         return; // 게임이 진행 중이지 않으면 종료
+    //     }
+
+    //     // 위치 이동
+    //     Vector2 nextVec = inputVec * speed * Time.fixedDeltaTime; // 다음 위치 계산
+    //     rigid.MovePosition(rigid.position + nextVec); // 리지드바디 위치 이동
+    // }
 
     void FixedUpdate()
     {
         if (!GameManager.instance.isLive)
-        {
-            return; // 게임이 진행 중이지 않으면 종료
-        }
+            return;
 
-        // 위치 이동
-        Vector2 nextVec = inputVec * speed * Time.fixedDeltaTime; // 다음 위치 계산
-        rigid.MovePosition(rigid.position + nextVec); // 리지드바디 위치 이동
+        // 먼저 위치 업데이트
+        Vector2 nextVec = inputVec * speed * Time.fixedDeltaTime;
+        rigid.MovePosition(rigid.position + nextVec);
+
+        // 위치가 업데이트된 후에 서버로 전송
+        if (inputVec != Vector2.zero)
+        {
+            NetworkManager.instance.SendLocationUpdatePacket(transform.position.x, transform.position.y);
+        }
     }
+
+
 
     // Update가 끝난 후 적용
     void LateUpdate()
