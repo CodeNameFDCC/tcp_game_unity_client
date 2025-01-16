@@ -27,4 +27,16 @@ public enum MessageType
 
     PING_REQUEST = 60, // 핑 요청
     PING_RESPONSE = 61, // 핑 응답
+
+    PLAYER_JOIN = 100,         // 플레이어 입장
+    PLAYER_JOIN_ACK = 101,     // 입장 승인 (서버 -> 새로운 클라이언트)
+    PLAYER_LEAVE = 102,        // 플레이어 퇴장
+    PLAYER_LIST = 103,         // 현재 플레이어 목록
+    PLAYER_SPAWN = 104,        // 다른 플레이어 스폰
+    PLAYER_DESPAWN = 105,      // 플레이어 디스폰
+
+    // 위치 동기화 관련
+    PLAYER_POSITION_UPDATE = 110,  // 플레이어 위치 업데이트
+    PLAYER_ROTATION_UPDATE = 111,  // 플레이어 회전 업데이트
+    PLAYER_TRANSFORM_SYNC = 112,   // 전체 Transform 동기화
 }
