@@ -1,23 +1,21 @@
-//Src/Codes/Follow.cs
+using UnityEngine; // Unity 관련 네임스페이스
 
-
-/* 게임 오브젝트가 플레이어의 위치를 따라가도록 하는 스크립트입니다.
-플레이어의 월드 좌표를 스크린 좌표로 변환하여 UI 요소의 위치를 업데이트합니다. */
-
-using UnityEngine;
-
+/// <summary>
+// 따라오시오 UI 
+/// </summary>
 public class Follow : MonoBehaviour
 {
-    RectTransform rect; // RectTransform 변수 선언
+    RectTransform rect; // UI 요소의 RectTransform을 저장할 변수
 
     void Awake()
     {
-        rect = GetComponent<RectTransform>(); // RectTransform 컴포넌트 가져오기
+        // 컴포넌트 초기화
+        rect = GetComponent<RectTransform>(); // 현재 오브젝트의 RectTransform 컴포넌트를 가져옴
     }
 
     void FixedUpdate()
     {
-        // 플레이어의 월드 좌표를 스크린 좌표로 변환하여 UI 요소 위치 업데이트
+        // 플레이어의 월드 좌표를 스크린 좌표로 변환하여 RectTransform의 위치 업데이트
         rect.position = Camera.main.WorldToScreenPoint(GameManager.instance.player.transform.position);
     }
 }
