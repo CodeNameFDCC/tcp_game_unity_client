@@ -1,145 +1,123 @@
-//src/Codes/Player.cs
-
-
-
-/**
- * 플레이어의 이동 및 애니메이션을 관리하는 클래스입니다.
- * 입력을 받아 플레이어의 위치를 업데이트하고, 애니메이션을 제어합니다.
- * 서버에 위치 업데이트 패킷을 전송합니다.
- */
-
-using TMPro;
-using UnityEngine;
+using TMPro; // TextMeshPro 관련 네임스페이스
+using UnityEngine; // Unity 관련 네임스페이스
 
 public class Player : MonoBehaviour
 {
-    public Vector2 inputVec; // 입력 벡터
-    public float speed; // 이동 속도
-    public string deviceId; // 디바이스 ID
-    public RuntimeAnimatorController[] animCon; // 애니메이터 컨트롤러 배열
+    // 입력 벡터 (x, y 방향)
+    public Vector2 inputVec;
 
-    Rigidbody2D rigid; // 2D 리지드바디
+    // 이동 속도
+    public float speed;
+
+    // 장치 ID
+    public string deviceId;
+
+    // 애니메이터 컨트롤러 배열
+    public RuntimeAnimatorController[] animCon;
+
+    // 필요한 컴포넌트 선언
+    Rigidbody2D rigid; // 2D 물리체
     SpriteRenderer spriter; // 스프라이트 렌더러
     Animator anim; // 애니메이터
-    TextMeshPro myText; // 텍스트 메쉬 프로
+    TextMeshPro myText; // TextMeshPro 텍스트
 
     void Awake()
     {
-        rigid = GetComponent<Rigidbody2D>(); // 리지드바디 컴포넌트 가져오기
-        spriter = GetComponent<SpriteRenderer>(); // 스프라이트 렌더러 가져오기
-        anim = GetComponent<Animator>(); // 애니메이터 가져오기
-        myText = GetComponentInChildren<TextMeshPro>(); // 자식에서 텍스트 메쉬 프로 가져오기
+        // 필요한 컴포넌트를 가져옴
+        rigid = GetComponent<Rigidbody2D>();
+        spriter = GetComponent<SpriteRenderer>();
+        anim = GetComponent<Animator>();
+        myText = GetComponentInChildren<TextMeshPro>();
     }
 
     void OnEnable()
     {
-        // 디바이스 ID를 텍스트로 설정
+        // 장치 ID가 5자 이상일 경우 잘라서 표시
         if (deviceId.Length > 5)
         {
-            myText.text = deviceId[..5]; // ID가 5자 이상이면 잘라서 표시
+            myText.text = deviceId[..5];
         }
         else
         {
-            myText.text = deviceId; // ID가 5자 이하이면 그대로 표시
+            myText.text = deviceId; // 장치 ID를 텍스트로 설정
         }
-        myText.GetComponent<MeshRenderer>().sortingOrder = 6; // 텍스트의 정렬 순서 설정
+
+        // 텍스트의 정렬 순서 설정
+        myText.GetComponent<MeshRenderer>().sortingOrder = 6;
 
         // 애니메이터 컨트롤러 설정
         anim.runtimeAnimatorController = animCon[GameManager.instance.playerId];
     }
 
-    // Update는 매 프레임 호출됩니다.
-
-
-    // void Update()
-    // {
-    //     if (!GameManager.instance.isLive)
-    //     {
-    //         return; // 게임이 진행 중이지 않으면 종료
-    //     }
-    //     // 입력 벡터 업데이트
-    //     inputVec.x = Input.GetAxisRaw("Horizontal");
-    //     inputVec.y = Input.GetAxisRaw("Vertical");
-    //     inputVec.Normalize();
-
-
-    //     // 현재 위치 가져오기
-    //     Vector2 currentPosition = rigid.position;
-
-    //     // 위치가 변경되었을 때만 패킷 전송
-    //     if (inputVec != Vector2.zero)
-    //     {
-    //         // 위치 이동 패킷 전송 -> 서버로
-    //         NetworkManager.instance.SendLocationUpdatePacket(currentPosition.x, currentPosition.y);
-    //     }
-
-    //     // 위치 이동 패킷 전송 -> 서버로
-    //     // NetworkManager.instance.SendLocationUpdatePacket(rigid.position.x, rigid.position.y);
-    // }
-
-    // Update에서는 입력만 처리
+    // Update는 매 프레임 호출됨
     void Update()
     {
+        // 게임이 활성화되지 않은 경우 조기 종료
         if (!GameManager.instance.isLive)
+        {
             return;
+        }
 
-        inputVec.x = Input.GetAxisRaw("Horizontal");
-        inputVec.y = Input.GetAxisRaw("Vertical");
-        inputVec.Normalize();
+        // 입력 값을 가져옴
+        inputVec.x = Input.GetAxisRaw("Horizontal"); // 수평 입력
+        inputVec.y = Input.GetAxisRaw("Vertical"); // 수직 입력
+
+        // 위치 이동 패킷 전송 -> 서버로
+        NetworkManager.instance.SendLocationUpdatePacket(rigid.position.x, rigid.position.y);
     }
 
-    // void FixedUpdate()
-    // {
-    //     if (!GameManager.instance.isLive)
-    //     {
-    //         return; // 게임이 진행 중이지 않으면 종료
-    //     }
+    // 다음 위치로 이동하는 메서드
+    public void MoveToNextPosition(Vector2 nextVec)
+    {
+        // 기존의 위치 이동 코드 주석 처리
+        // rigid.MovePosition(nextVec);
 
-    //     // 위치 이동
-    //     Vector2 nextVec = inputVec * speed * Time.fixedDeltaTime; // 다음 위치 계산
-    //     rigid.MovePosition(rigid.position + nextVec); // 리지드바디 위치 이동
-    // }
+        // 보간을 사용하여 부드럽게 이동
+        Vector2 newPos = Vector2.Lerp(rigid.position, nextVec, Time.fixedDeltaTime);
+        rigid.MovePosition(newPos); // 새로운 위치로 이동
+    }
 
+    // FixedUpdate는 물리 업데이트에 사용됨
     void FixedUpdate()
     {
+        // 게임이 활성화되지 않은 경우 조기 종료
         if (!GameManager.instance.isLive)
-            return;
-
-        // 먼저 위치 업데이트
-        Vector2 nextVec = inputVec * speed * Time.fixedDeltaTime;
-        rigid.MovePosition(rigid.position + nextVec);
-
-        // 위치가 업데이트된 후에 서버로 전송
-        if (inputVec != Vector2.zero)
         {
-            NetworkManager.instance.SendLocationUpdatePacket(transform.position.x, transform.position.y);
+            return;
         }
+
+        // 위치 이동
+        Vector2 nextVec = inputVec * speed * Time.fixedDeltaTime; // 이동할 벡터 계산
+        rigid.MovePosition(rigid.position + nextVec); // 현재 위치에 이동 벡터를 더함
     }
 
-
-
-    // Update가 끝난 후 적용
+    // Update가 끝난 후 애니메이션 관련 작업 수행
     void LateUpdate()
     {
+        // 게임이 활성화되지 않은 경우 조기 종료
         if (!GameManager.instance.isLive)
         {
-            return; // 게임이 진행 중이지 않으면 종료
+            return;
         }
 
-        anim.SetFloat("Speed", inputVec.magnitude); // 애니메이션 속도 설정
+        // 애니메이션의 속도 설정
+        anim.SetFloat("Speed", inputVec.magnitude);
 
-        // 방향에 따라 스프라이트 반전
+        // 방향에 따라 스프라이트를 뒤집음
         if (inputVec.x != 0)
         {
-            spriter.flipX = inputVec.x < 0; // 왼쪽으로 이동 시 스프라이트 반전
+            spriter.flipX = inputVec.x < 0; // 왼쪽 방향이면 스프라이트 뒤집기
         }
     }
 
+    // 충돌이 발생하고 있는 동안 호출됨
     void OnCollisionStay2D(Collision2D collision)
     {
+        // 게임이 활성화되지 않은 경우 조기 종료
         if (!GameManager.instance.isLive)
         {
-            return; // 게임이 진행 중이지 않으면 종료
+            return;
         }
+        // 충돌 처리 로직을 여기에 추가할 수 있음
     }
 }
