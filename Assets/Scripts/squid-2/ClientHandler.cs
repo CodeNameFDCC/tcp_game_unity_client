@@ -1,7 +1,6 @@
 // ClientHandler.cs
 using UnityEngine;
 using System;
-using ProtoBuf.Meta;
 
 public class ClientHandler
 {
@@ -16,6 +15,11 @@ public class ClientHandler
     public event Action<Vector3> OnPositionReceived;
     public event Action<Quaternion> OnQuaternionReceived;
     public event Action<string> OnPingReceived;
+
+    public event Action<int, Vector3, Quaternion> OnPlayerSpawn;
+    public event Action<int> OnPlayerDespawn;
+    public event Action<int, Vector3> OnPlayerPositionUpdate;
+    public event Action<int, Quaternion> OnPlayerRotationUpdate;
 
 
 
@@ -35,6 +39,12 @@ public class ClientHandler
         OnPositionReceived = null;
         OnQuaternionReceived = null;
         OnPingReceived = null;
+
+
+        OnPlayerSpawn = null;
+        OnPlayerDespawn = null;
+        OnPlayerPositionUpdate = null;
+        OnPlayerRotationUpdate = null;
     }
 
     ~ClientHandler()
@@ -94,6 +104,25 @@ public class ClientHandler
                 case MessageType.PING_RESPONSE:
                     OnStringReceived?.Invoke((string)value);
                     break;
+                case MessageType.PLAYER_SPAWN:
+                    var spawnData = (PlayerSpawnData)value;
+                    OnPlayerSpawn?.Invoke(spawnData.PlayerId, spawnData.Position, spawnData.Rotation);
+                    break;
+
+                case MessageType.PLAYER_DESPAWN:
+                    var despawnData = (PlayerDespawnData)value;
+                    OnPlayerDespawn?.Invoke(despawnData.PlayerId);
+                    break;
+
+                case MessageType.PLAYER_POSITION_UPDATE:
+                    var posData = (PlayerPositionData)value;
+                    OnPlayerPositionUpdate?.Invoke(posData.PlayerId, posData.Position);
+                    break;
+
+                case MessageType.PLAYER_ROTATION_UPDATE:
+                    var rotData = (PlayerRotationData)value;
+                    OnPlayerRotationUpdate?.Invoke(rotData.PlayerId, rotData.Rotation);
+                    break;
                 default:
                     if ((int)type % 2 == 0) // If it's a response message
                     {
@@ -139,4 +168,14 @@ public class ClientHandler
     public byte[] CreateStringResponse(string value) => messageParser.CreateStringResponse(value);
     public byte[] CreatePositionResponse(Vector3 position) => messageParser.CreatePositionResponse(position);
     public byte[] CreateQuaternionResponse(Quaternion rotation) => messageParser.CreateQuaternionResponse(rotation);
+
+    public byte[] CreatePositionUpdateMessage(Vector3 position)
+    {
+        return messageParser.CreatePositionUpdateMessage(position);
+    }
+
+    public byte[] CreateRotationUpdateMessage(Quaternion rotation)
+    {
+        return messageParser.CreateRotationUpdateMessage(rotation);
+    }
 }

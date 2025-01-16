@@ -122,6 +122,25 @@ public class BinaryHelper
         WriteFloat(quaternion.w);
     }
 
+    // Vector3 읽기
+    public Vector3 ReadPosition()
+    {
+        float x = ReadFloat();
+        float y = ReadFloat();
+        float z = ReadFloat();
+        return new Vector3(x, y, z);
+    }
+
+    // Quaternion 읽기
+    public Quaternion ReadQuaternion()
+    {
+        float x = ReadFloat();
+        float y = ReadFloat();
+        float z = ReadFloat();
+        float w = ReadFloat();
+        return new Quaternion(x, y, z, w);
+    }
+
     // Reading methods
     public sbyte ReadInt8()
     {
@@ -173,25 +192,6 @@ public class BinaryHelper
         string value = Encoding.UTF8.GetString(buffer, offset, length);
         offset += length;
         return value;
-    }
-
-    public Vector3 ReadPosition()
-    {
-        return new Vector3(
-            ReadFloat(),
-            ReadFloat(),
-            ReadFloat()
-        );
-    }
-
-    public Quaternion ReadQuaternion()
-    {
-        return new Quaternion(
-            ReadFloat(),
-            ReadFloat(),
-            ReadFloat(),
-            ReadFloat()
-        );
     }
 
     // Buffer management

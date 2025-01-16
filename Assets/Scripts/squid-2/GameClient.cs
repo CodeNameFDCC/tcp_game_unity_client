@@ -197,6 +197,16 @@ public class GameClient : MonoBehaviour
         SendMessage(handler.CreateQuaternionResponse(rotation));
     }
 
+    public void SendPositionUpdate(Vector3 position)
+    {
+        SendMessage(handler.CreatePositionUpdateMessage(position));
+    }
+
+    public void SendRotationUpdate(Quaternion rotation)
+    {
+        SendMessage(handler.CreateRotationUpdateMessage(rotation));
+    }
+
     private void Disconnect()
     {
         isConnected = false;
